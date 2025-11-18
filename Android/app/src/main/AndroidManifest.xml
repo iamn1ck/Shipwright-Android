@@ -113,14 +113,10 @@
             </intent-filter>
 
             
-            <!-- 🟢 Meta / OpenXR runtime metadata -->
-            <meta-data
-                android:name="xr_runtime"
-                android:value="oculus" />
+            <!-- Meta / OpenXR runtime metadata -->
+            <meta-data android:name="xr_runtime" android:value="oculus" />
 
-            <meta-data
-                android:name="com.oculus.openxr.runtime_built_for"
-                android:value="oculus_mobile" />
+            <meta-data android:name="com.oculus.openxr.runtime_built_for" android:value="oculus_mobile" />
 
             <meta-data android:name="com.oculus.supportedDevices" android:value="quest|quest2|questpro|quest3" />
 
@@ -141,25 +137,13 @@
                 android:name="com.oculus.handtracking.frequency"
                 android:value="LOW" />
 
-            <!-- 🟢 Main activity for VR launcher -->
+            <!-- Main activity for VR launcher -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
                 <category android:name="com.oculus.intent.category.VR" />
             </intent-filter>
-
-
-
-            <!-- Drop file event -->
-            <!--
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="*/*" />
-            </intent-filter>
-            -->
         </activity>
     </application>
-
 </manifest>
