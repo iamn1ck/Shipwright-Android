@@ -84,7 +84,7 @@ ENV ANDROID_NDK_HOME=${ANDROID_INSTALL_PATH}/ndk/${ANDROID_NDK_VERSION}
 ENV PATH=${ANDROID_INSTALL_PATH}/cmdline-tools/latest/bin:${ANDROID_INSTALL_PATH}/platform-tools:${ANDROID_INSTALL_PATH}/build-tools/${ANDROID_BUILD_TOOLS_VERSION}:$PATH
 
 # Container working directory
-WORKDIR /workspace
+WORKDIR /workspace/Shipwright-android
 
 RUN mkdir /workspace/include
 RUN mkdir /workspace/lib

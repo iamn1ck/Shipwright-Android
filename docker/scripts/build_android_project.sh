@@ -45,8 +45,8 @@ fi
 # Run Container to build
 docker run --network="host" --rm \
     --name $CONTAINER_NAME \
-    -v "$PROJECT_PATH":/workspace \
-    -w /workspace \
+    -v "$PROJECT_PATH":/workspace/Shipwright-android \
+    -w /workspace/Shipwright-android \
     $IMAGE_NAME \
     bash -c "cp -a local.properties Android/ && cd Android && ./gradlew ${GRADLEW_BUILD_TYPE}"
 
