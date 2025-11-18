@@ -48,7 +48,10 @@ docker run --network="host" --rm \
     -v "$PROJECT_PATH":/workspace \
     -w /workspace \
     $IMAGE_NAME \
-    bash -c "cp -a local.properties Android/ && cd Android && ./gradlew ${GRADLEW_BUILD_TYPE}"
+    bash -c "cp -a local.properties Android/ && \
+    mkdir -p Android/app/src/main/jniLibs/arm64-v8a && \
+    cp /workspace/lib/libopenxr_loader.so Android/app/src/main/jniLibs/arm64-v8a/ && \
+    cd Android && ./gradlew ${GRADLEW_BUILD_TYPE}"
 
 BUILD_RESULT=$?
 
