@@ -1,7 +1,7 @@
 [submodule "libultraship"]
 	path = libultraship
-	url = https://github.com/iamn1ck/libultraship-OpenXR.git
-	branch = openxr
+	url = https://github.com/Waterdish/libultraship.git
+	branch = openxr-dev
 [submodule "OTRExporter"]
 	path = OTRExporter
 	url = https://github.com/Waterdish/OTRExporter.git
