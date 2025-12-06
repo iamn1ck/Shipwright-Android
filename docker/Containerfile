@@ -42,7 +42,8 @@ RUN apt-get update && \
         zip \
         ninja-build \
         build-essential \
-        ca-certificates && \
+        ca-certificates \
+        libopenxr-dev && \
     apt-get clean --yes && \
     rm -rf /var/lib/apt/lists/*
 
@@ -83,7 +84,22 @@ ENV ANDROID_NDK_HOME=${ANDROID_INSTALL_PATH}/ndk/${ANDROID_NDK_VERSION}
 ENV PATH=${ANDROID_INSTALL_PATH}/cmdline-tools/latest/bin:${ANDROID_INSTALL_PATH}/platform-tools:${ANDROID_INSTALL_PATH}/build-tools/${ANDROID_BUILD_TOOLS_VERSION}:$PATH
 
 # Container working directory
-WORKDIR /workspace
+WORKDIR /workspace/Shipwright-android
+
+RUN mkdir /workspace/include
+RUN mkdir /workspace/lib
+
+RUN wget https://github.com/KhronosGroup/OpenXR-SDK/archive/refs/tags/release-1.1.53.tar.gz -O /tmp/release-1.1.53.tar.gz && \
+    tar xf /tmp/release-1.1.53.tar.gz -C /tmp && \
+    mv /tmp/OpenXR-SDK-release-1.1.53/include/* /workspace/include && \
+    rm -rf /tmp/OpenXR-SDK-release-1.1.53 && \
+    rm /tmp/release-1.1.53.tar.gz
+
+RUN wget https://github.com/KhronosGroup/Vulkan-Headers/archive/refs/tags/vulkan-sdk-1.3.296.0.zip -O /tmp/vulkan-sdk-1.3.296.0.zip && \
+    unzip /tmp/vulkan-sdk-1.3.296.0.zip -d /tmp && \
+    mv /tmp/Vulkan-Headers-vulkan-sdk-1.3.296.0/include/* /workspace/include && \
+    rm -rf /tmp/Vulkan-Headers-vulkan-sdk-1.3.296.0 && \
+    rm /tmp/vulkan-sdk-1.3.296.0.zip
 
 # Add and Setup Container Entry Point Script
 COPY ./scripts/entrypoint.sh /opt/entrypoint.sh
