@@ -159,10 +159,23 @@ set(GBI_UCODE F3DEX_GBI_2)
 ################################################################################
 add_compile_definitions(CONTROLLERBUTTONS_T=uint32_t)
 
+
 ################################################################################
 # Sub-projects
 ################################################################################
 add_subdirectory(libultraship ${CMAKE_BINARY_DIR}/libultraship)
+
+add_compile_definitions(OPENXR_ENABLED)
+
+target_compile_definitions(libultraship PRIVATE OPENXR_ENABLED)
+
+add_custom_target(PatchUltraship ALL
+    COMMAND ${CMAKE_COMMAND} -E echo "Patching Vulkan dependency for Quest..."
+    COMMAND patchelf --replace-needed libvulkan.so.1 libvulkan.so $<TARGET_FILE:libultraship>
+    DEPENDS libultraship
+    COMMENT "Patched libultraship Vulkan dependency for Quest runtime"
+)
+
 target_compile_options(libultraship PRIVATE "${WARNING_OVERRIDE}")
 add_subdirectory(ZAPDTR/ZAPD ${CMAKE_BINARY_DIR}/ZAPD)
 add_subdirectory(OTRExporter)
