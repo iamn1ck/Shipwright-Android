@@ -37,8 +37,8 @@ import android.widget.ImageView;
 import java.util.concurrent.Executors;
 import android.app.AlertDialog;
 
-//This class is the MainActivity that runs the extractor on first launch
-public class MainActivity extends SDLActivity{
+//This class is the secondary SDLActivity and runs the main game
+public class SecondaryActivity extends SDLActivity{
 
     SharedPreferences preferences;
     private static final CountDownLatch setupLatch = new CountDownLatch(1);
@@ -60,19 +60,6 @@ public class MainActivity extends SDLActivity{
 
         preferences = getSharedPreferences("com.dishii.soh.prefs",Context.MODE_PRIVATE);
 
-        // Check if oot.otr already exists - if so, skip to SecondaryActivity
-        File targetRootFolder = new File(Environment.getExternalStorageDirectory(), "SOH");
-        File otrFile = new File(targetRootFolder, "oot.otr");
-        
-        if (otrFile.exists()) {
-            // Game is already set up, go directly to SecondaryActivity
-            Intent intent = new Intent(MainActivity.this, SecondaryActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-            return;
-        }
-
         // Check if storage permissions are granted
         if (hasStoragePermission()) {
             doVersionCheck();
@@ -82,57 +69,10 @@ public class MainActivity extends SDLActivity{
         }
 
         super.onCreate(savedInstanceState);
-        
-        // Disable OpenXR for the extractor activity (after library is loaded)
-        setOpenXREnabled(false);
-        // SecondaryActivity will be launched when extraction completes via onExtractionComplete()
+
+        setupControllerOverlay();
+        attachController();
     }
-    
-    // Called by native code when extraction is complete
-    public void onExtractionComplete() {
-        // Run the cleanup and transition on a background thread to avoid blocking UI thread
-        Executors.newSingleThreadExecutor().execute(() -> {
-
-            
-            // Wait for MainActivity's GL context to be fully destroyed
-            // before SecondaryActivity creates its own OpenXR/GL context
-            try {
-                Thread.sleep(5000); // 5 second delay for GL context cleanup
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            
-            //             // Clean up GL resources on UI thread first
-            // runOnUiThread(() -> {
-            //     cleanupGLResources();
-            //     finish();
-            // });
-            // // Launch SecondaryActivity on UI thread
-            // runOnUiThread(() -> {
-            //     Intent intent = new Intent(MainActivity.this, SecondaryActivity.class);
-            //     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            //     startActivity(intent);
-            // });
-            restartApp(this);
-
-        });
-    }
-
-    public void restartApp(Context context) {
-        Intent intent = new Intent(context, SecondaryActivity.class);
-
-        if (intent != null) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        }
-
-        context.startActivity(intent);
-
-        // Kill the process so app restarts clean
-        android.os.Process.killProcess(android.os.Process.myPid());
-        System.exit(0);
-    }
-
 
     public static void waitForSetupFromNative() {
         try {
@@ -698,26 +638,5 @@ public class MainActivity extends SDLActivity{
 
     }
 
-
-    // saving just in case
-    // // Helper method to clean up GL resources
-    // private void cleanupGLResources() {
-    //     if (mSurface != null) {
-    //         mSurface.handlePause();
-    //         mSurface.getHolder().removeCallback(mSurface);
-    //     }
-    //     // The finish() call will trigger onDestroy() which will properly
-    //     // clean up the EGL context through SDL's normal lifecycle
-    // }
-
-    // @Override
-    // protected void onDestroy() {
-    //     // Force cleanup of OpenGL/EGL context before parent onDestroy
-    //     // This prevents GL state conflicts with SecondaryActivity's VR context
-    //     cleanupGLResources();
-        
-    //     // Ensure GL context is destroyed
-    //     super.onDestroy();
-    // }
 
 }

@@ -43,7 +43,7 @@ s32 Camera_UpdateWater(Camera* camera);
 float touchCameraYaw=0;
 float touchCameraPitch=0;
 
-extern void JNICALL Java_com_dishii_soh_MainActivity_setCameraState(JNIEnv *env, jobject jobj, jint axis, jfloat value) {
+extern void JNICALL Java_com_dishii_soh_SecondaryActivity(JNIEnv *env, jobject jobj, jint axis, jfloat value) {
     switch(axis){
         case 0:
             touchCameraYaw=value;

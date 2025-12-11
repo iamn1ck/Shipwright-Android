@@ -44,10 +44,24 @@ void wait_for_java_setup() {
 
     jclass activityClass = (*env)->GetObjectClass(env, activity);
     jclass mainActivityClass = (*env)->FindClass(env, "com/dishii/soh/MainActivity");
+    jclass secondaryActivityClass = (*env)->FindClass(env, "com/dishii/soh/SecondaryActivity");
 
-    jmethodID waitMethod = (*env)->GetStaticMethodID(env, mainActivityClass, "waitForSetupFromNative", "()V");
+    // Check if current activity is MainActivity or SecondaryActivity
+    jboolean isMainActivity = (*env)->IsInstanceOf(env, activity, mainActivityClass);
+    jboolean isSecondaryActivity = (*env)->IsInstanceOf(env, activity, secondaryActivityClass);
 
-    (*env)->CallStaticVoidMethod(env, mainActivityClass, waitMethod);
+    if (isMainActivity) {
+        jmethodID waitMethod = (*env)->GetStaticMethodID(env, mainActivityClass, "waitForSetupFromNative", "()V");
+        (*env)->CallStaticVoidMethod(env, mainActivityClass, waitMethod);
+    } else if (isSecondaryActivity) {
+        jmethodID waitMethod = (*env)->GetStaticMethodID(env, secondaryActivityClass, "waitForSetupFromNative", "()V");
+        (*env)->CallStaticVoidMethod(env, secondaryActivityClass, waitMethod);
+    }
+
+    (*env)->DeleteLocalRef(env, secondaryActivityClass);
+    (*env)->DeleteLocalRef(env, mainActivityClass);
+    (*env)->DeleteLocalRef(env, activityClass);
+    (*env)->DeleteLocalRef(env, activity);
 }
 #endif
 
@@ -84,6 +98,33 @@ int main(int argc, char** argv) {
     BootCommands_Init();
 
     Heaps_Alloc();
+
+    #ifdef __ANDROID__
+    // Notify MainActivity that extraction is complete (only if we're in MainActivity)
+    JNIEnv* env = SDL_AndroidGetJNIEnv();
+    if (env) {
+        jobject activity = SDL_AndroidGetActivity();
+        if (activity) {
+            jclass activityClass = (*env)->GetObjectClass(env, activity);
+            jclass mainActivityClass = (*env)->FindClass(env, "com/dishii/soh/MainActivity");
+            
+            // Check if current activity is an instance of MainActivity
+            jboolean isMainActivity = (*env)->IsInstanceOf(env, activity, mainActivityClass);
+            
+            if (isMainActivity) {
+                jmethodID onExtractionComplete = (*env)->GetMethodID(env, activityClass, "onExtractionComplete", "()V");
+                if (onExtractionComplete) {
+                    (*env)->CallVoidMethod(env, activity, onExtractionComplete);
+                }
+            }
+            
+            (*env)->DeleteLocalRef(env, mainActivityClass);
+            (*env)->DeleteLocalRef(env, activityClass);
+            (*env)->DeleteLocalRef(env, activity);
+        }
+    }
+    #endif
+
     Main(0);
     DeinitOTR();
     Heaps_Free();
